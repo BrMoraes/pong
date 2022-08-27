@@ -1,0 +1,29 @@
+/* override browser default */
+html,
+body {
+    /* no margin */
+    margin: 0;
+    /* no padding */
+    padding: 0;
+    /* width and height properties includes content, padding and border */
+    box-sizing: border-box;
+}
+
+/* use viewport-relative units to cover page fully */
+body {
+    /* height is total height of the viewport */
+    height: 100vh;
+    /* width is total width of the viewport */
+    width: 100vw;
+    /* center content by flexbox */
+    display: flex;
+    /* center content vertically */
+    align-items: center;
+    /* center content horizontally */
+    justify-content: center;
+}
+
+#canvas {
+    /* 1 pixel black border */
+    border: solid black 1px;
+}
