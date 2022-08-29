@@ -1,17 +1,32 @@
-var canvas = document.getElementById('canvas');
-var context = canvas.getContext('2d');
-const width = 800;
-const height = 600;
-var change = 1;
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+function setSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+setSize();
+
+let colors = [
+    "#FFFFFF", "#000000",
+    "#FF0000", "#00FF00", "#0000FF",
+    "#00FFFF", "#FF00FF", "#FFFF00",
+    "#80FF00", "#8000FF", "#FF8000", "#0080FF", "#00FF80", "#FF0080"
+]
+
+const minRadius = 10;
+const maxRadius = 60;
+const minSpeed = 3;
+const maxSpeed = 10;
 
 class Ball {
-    constructor(color) {
-        this.color = color;
-        this.radius = Math.abs(this.generateRandomInt(20, 60));
-        this.x = Math.abs(this.generateRandomInt(this.radius, width - this.radius));
-        this.y = Math.abs(this.generateRandomInt(this.radius, height - this.radius));
-        this.speedX = this.generateRandomInt(5, 10);
-        this.speedY = this.generateRandomInt(5, 10);
+    constructor() {
+        this.radius = Math.abs(this.generateRandomInt(minRadius, maxRadius));
+        this.x = Math.abs(this.generateRandomInt(this.radius, canvas.width - this.radius));
+        this.y = Math.abs(this.generateRandomInt(this.radius, canvas.height - this.radius));
+        this.speedX = this.generateRandomInt(minSpeed, maxSpeed);
+        this.speedY = this.generateRandomInt(minSpeed, maxSpeed);
     }
 
     draw() {
@@ -24,14 +39,18 @@ class Ball {
 
     move() {
         this.draw();
-        if (this.x + this.radius >= 800 || this.x - this.radius <= 0) {
+        if (this.x + this.radius >= canvas.width || this.x - this.radius <= 0) {
             this.speedX *= -1;
         }
-        if (this.y + this.radius >= 600 || this.y - this.radius <= 0) {
+        if (this.y + this.radius >= canvas.height || this.y - this.radius <= 0) {
             this.speedY *= -1;
         }
         this.x += this.speedX;
         this.y += this.speedY;
+    }
+
+    updateColor(color) {
+        this.color = color;
     }
 
     generateRandomInt(min, max) {
@@ -41,20 +60,37 @@ class Ball {
     }
 }
 
-const red = new Ball("red")
-const green = new Ball("green")
-const blue = new Ball("blue")
+const ballArray = [];
 
-function clear() { // clears the canvas
-    context.fillStyle = 'rgba(255, 255, 255, 0.3)';
+for (i = 0; i < 14; i++) {
+    ballArray[i] = new Ball();
+}
+
+function clear() {
+    context.fillStyle = 'rgba(128, 128, 128, 0.3)';
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-setInterval(update, 20);  // refresh the canvas every 20ms (50 fps)
+window.onresize = () => setSize();
 
-function update() { // clears and redraw the canvas
+let timer = null;
+let counter = 0;
+const colorFrames = 180;
+
+function update() {
     clear();
-    red.move();
-    green.move();
-    blue.move();
+    for (i = 0; i < 14; i++) {
+        ballArray[i].move();
+        ballArray[i].updateColor(colors[i]);
+    }
+    if (counter > colorFrames) {
+        colors = colors.sort(() => Math.random() - 0.5);
+        console.log(colors);
+    }
+    counter = counter > colorFrames ? 0 : counter + 1;
+
+    cancelAnimationFrame(timer);
+    timer = window.requestAnimationFrame(() => update());
 }
+
+update();
